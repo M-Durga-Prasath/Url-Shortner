@@ -1,26 +1,284 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: #0B0F19;
+  --color-surface: #111827;
+  --color-surface-alt: #1a2235;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-accent-purple: #7C3AED;
+  --color-accent-blue: #3B82F6;
+  --color-accent-cyan: #22d3ee;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ───────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(124, 58, 237, 0.35);
+  color: #fff;
+}
+
+/* ── Gradient utilities ─────────────────────────────── */
+
+.gradient-text {
+  background: linear-gradient(135deg, #7C3AED, #3B82F6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, #7C3AED, #3B82F6);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gradient-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #6d28d9, #2563eb);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.gradient-btn:hover::before {
+  opacity: 1;
+}
+
+.gradient-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
+}
+
+.gradient-btn:active {
+  transform: translateY(0);
+}
+
+.gradient-btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gradient-border {
+  position: relative;
+  background: var(--color-surface);
+  border-radius: 16px;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(59, 130, 246, 0.3));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+/* ── Glow effect ────────────────────────────────────── */
+
+.glow {
+  position: relative;
+}
+
+.glow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60%;
+  height: 60%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15), transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── Card hover ─────────────────────────────────────── */
+
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+/* ── Animations ─────────────────────────────────────── */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(124, 58, 237, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease forwards;
+}
+
+/* ── Skeleton loader ────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ── Toast ──────────────────────────────────────────── */
+
+.toast {
+  animation: toast-in 0.3s ease forwards;
+}
+
+.toast-exit {
+  animation: toast-out 0.3s ease forwards;
+}
+
+/* ── Spinner ────────────────────────────────────────── */
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ── Scrollbar ──────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Input focus ring ───────────────────────────────── */
+
+input:focus,
+textarea:focus {
+  outline: none;
 }
