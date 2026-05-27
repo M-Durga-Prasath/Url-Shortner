@@ -4,8 +4,6 @@ import { useState } from "react";
 
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
-  { label: "Analytics", href: "#analytics" },
-  { label: "Pricing", href: "#pricing" },
 ];
 
 export default function Navbar() {
@@ -39,10 +37,10 @@ export default function Navbar() {
         </div>
 
         {/* Desktop actions */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="flex items-center gap-4" id="desktop-actions"> 
           <button
             id="nav-signin"
-            className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200 cursor-pointer"
+            className=" text-sm text-text-secondary hover:text-text-primary transition-colors duration-200 cursor-pointer"
           >
             Sign In
           </button>

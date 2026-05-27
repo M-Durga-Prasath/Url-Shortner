@@ -1,7 +1,5 @@
 const FOOTER_LINKS = [
-  { label: "Privacy", href: "#" },
-  { label: "Terms", href: "#" },
-  { label: "Contact", href: "#" },
+  { label: "Made With 💘 MDP", href: "https://github.com/M-Durga-Prasath" },
 ];
 
 export default function Footer() {
@@ -26,6 +24,7 @@ export default function Footer() {
               href={link.href}
               className="text-sm text-text-muted hover:text-text-secondary transition-colors duration-200"
               id={`footer-${link.label.toLowerCase()}`}
+              target="_blank"
             >
               {link.label}
             </a>

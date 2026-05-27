@@ -282,3 +282,15 @@ input:focus,
 textarea:focus {
   outline: none;
 }
+
+
+#desktop-actions {
+  display: none;
+}
+
+/* Show on screens >=768px */
+@media (min-width: 768px) {
+  #desktop-actions {
+    display: flex;
+  }
+}

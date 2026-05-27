@@ -92,8 +92,8 @@ export default function Hero({ onLinkCreated }) {
   return (
     <section className="relative pt-32 pb-20 px-6 overflow-hidden" id="hero">
       {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] pointer-events-none opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/20 via-accent-blue/10 to-transparent rounded-full blur-3xl" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-150 pointer-events-none opacity-30">
+        <div className="absolute inset-0 bg-linear-to-b from-accent-purple/20 via-accent-blue/10 to-transparent rounded-full blur-3xl" />
       </div>
 
       <div className="relative max-w-3xl mx-auto text-center">
@@ -174,7 +174,7 @@ export default function Hero({ onLinkCreated }) {
                   id="shorten-btn"
                   type="submit"
                   disabled={loading}
-                  className="gradient-btn text-white font-semibold px-8 py-4 rounded-xl text-sm disabled:opacity-60 disabled:cursor-not-allowed sm:min-w-[160px] cursor-pointer"
+                  className="gradient-btn text-white font-semibold px-8 py-4 rounded-xl text-sm disabled:opacity-60 disabled:cursor-not-allowed sm:min-w-40 cursor-pointer"
                 >
                   <span className="flex items-center justify-center gap-2">
                     {loading ? (
