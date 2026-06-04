@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ToastProvider } from "./components/Toast";
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Features from "./components/Features";
-import RecentLinks from "./components/RecentLinks";
-import Footer from "./components/Footer";
+import { ToastProvider } from "../components/Toast";
+import Navbar from "../components/Navbar";
+import Hero from "../components/Hero";
+import Features from "../components/Features";
+import RecentLinks from "../components/RecentLinks";
+import Footer from "../components/Footer";
 
 function HomeContent() {
   const [recentLinks, setRecentLinks] = useState([]);
