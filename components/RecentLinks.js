@@ -1,31 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "./Toast";
-
-const DEMO_LINKS = [
-  {
-    id: 1,
-    originalUrl: "https://www.example.com/very-long-marketing-campaign-url-spring-2025",
-    shortUrl: "snip.link/spring25",
-    clicks: 3248,
-    createdAt: "2025-05-20T10:30:00Z",
-  },
-  {
-    id: 2,
-    originalUrl: "https://docs.google.com/document/d/1AbCdEf/edit?usp=sharing",
-    shortUrl: "snip.link/gdocs",
-    clicks: 1892,
-    createdAt: "2025-05-18T14:15:00Z",
-  },
-  {
-    id: 3,
-    originalUrl: "https://github.com/username/my-awesome-repo/tree/main/src",
-    shortUrl: "snip.link/repo",
-    clicks: 967,
-    createdAt: "2025-05-15T08:00:00Z",
-  },
-];
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -40,8 +16,36 @@ function truncateUrl(url, max = 45) {
 }
 
 export default function RecentLinks({ extraLinks = [] }) {
-  const [links, setLinks] = useState(DEMO_LINKS);
+  const [links, setLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const toast = useToast();
+
+  useEffect(() => {
+    async function fetchLinks() {
+      try {
+        const res = await fetch("/api/links");
+        const data = await res.json();
+
+        if (data.success && data.links) {
+          setLinks(
+            data.links.map((l) => ({
+              id: l.id,
+              originalUrl: l.originalUrl,
+              shortUrl: `snip.link/${l.shortCode}`,
+              clicks: l.clicks,
+              createdAt: l.createdAt,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch links:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLinks();
+  }, []);
 
   const allLinks = [...extraLinks, ...links];
 
@@ -92,9 +96,9 @@ export default function RecentLinks({ extraLinks = [] }) {
               <p className="text-sm">No links yet. Shorten your first URL above!</p>
             </div>
           ) : (
-            allLinks.map((link) => (
+            allLinks.map((link, index) => (
               <div
-                key={link.id}
+                key={link.id ?? index}
                 className="group grid grid-cols-1 lg:grid-cols-[1fr_180px_80px_100px_120px] gap-3 lg:gap-4 px-6 py-5 border-b border-border last:border-0 hover:bg-surface-alt/50 transition-colors duration-200"
                 id={`link-${link.id}`}
               >

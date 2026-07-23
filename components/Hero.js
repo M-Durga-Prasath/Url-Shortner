@@ -13,9 +13,12 @@ function isValidUrl(str) {
 }
 
 function generateShortCode() {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  // remporary short code generator
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let code = "";
-  for (let i = 0; i < 7; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  for (let i = 0; i < 7; i++)
+    code += chars[Math.floor(Math.random() * chars.length)];
   return code;
 }
 
@@ -47,24 +50,39 @@ export default function Hero({ onLinkCreated }) {
 
     setLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const code = alias.trim() || generateShortCode();
-    const shortened = `snip.link/${code}`;
-
-    setShortenedUrl(shortened);
-    setLoading(false);
-    toast("Link shortened successfully!", "success");
-
-    if (onLinkCreated) {
-      onLinkCreated({
-        id: Date.now(),
-        originalUrl: url,
-        shortUrl: shortened,
-        clicks: 0,
-        createdAt: new Date().toISOString(),
+    try {
+      const res = await fetch("/api/links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, alias }),
       });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        toast(data.message || "Failed to shorten link", "error");
+        setLoading(false);
+        return;
+      }
+
+      const shortened = `snip.link/${data.shortCode}`;
+      setShortenedUrl(shortened);
+      toast("Link shortened successfully!", "success");
+
+      if (onLinkCreated) {
+        onLinkCreated({
+          id: data.shortCode,
+          originalUrl: url,
+          shortUrl: shortened,
+          clicks: 0,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error("Error sending POST request:", error);
+      toast("Something went wrong", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,8 +128,7 @@ export default function Hero({ onLinkCreated }) {
           className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6 animate-fade-in-up"
           style={{ animationDelay: "0.1s", animationFillMode: "both" }}
         >
-          Shorten Links.{" "}
-          <span className="gradient-text">Share Smarter.</span>
+          Shorten Links. <span className="gradient-text">Share Smarter.</span>
         </h1>
 
         {/* Subheading */}
@@ -119,8 +136,8 @@ export default function Hero({ onLinkCreated }) {
           className="text-lg sm:text-xl text-text-secondary max-w-xl mx-auto mb-12 animate-fade-in-up"
           style={{ animationDelay: "0.2s", animationFillMode: "both" }}
         >
-          Transform long URLs into clean, trackable short links. Monitor performance
-          with real-time analytics.
+          Transform long URLs into clean, trackable short links. Monitor
+          performance with real-time analytics.
         </p>
 
         {/* URL shortener form */}
@@ -138,16 +155,24 @@ export default function Hero({ onLinkCreated }) {
                   id="url-input"
                   type="text"
                   value={url}
-                  onChange={(e) => { setUrl(e.target.value); setUrlError(""); }}
+                  onChange={(e) => {
+                    setUrl(e.target.value);
+                    setUrlError("");
+                  }}
                   placeholder="Paste your long URL here..."
                   className={`w-full bg-background border ${
-                    urlError ? "border-error" : "border-border focus:border-accent-purple"
+                    urlError
+                      ? "border-error"
+                      : "border-border focus:border-accent-purple"
                   } rounded-xl px-5 py-4 text-text-primary text-sm placeholder:text-text-muted transition-colors duration-200`}
                   aria-label="URL to shorten"
                   aria-invalid={!!urlError}
                 />
                 {urlError && (
-                  <p className="absolute -bottom-6 left-1 text-xs text-error" role="alert">
+                  <p
+                    className="absolute -bottom-6 left-1 text-xs text-error"
+                    role="alert"
+                  >
                     {urlError}
                   </p>
                 )}
@@ -163,7 +188,9 @@ export default function Hero({ onLinkCreated }) {
                     id="alias-input"
                     type="text"
                     value={alias}
-                    onChange={(e) => setAlias(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
+                    onChange={(e) =>
+                      setAlias(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))
+                    }
                     placeholder="custom-alias"
                     maxLength={20}
                     className="w-full bg-background border border-border focus:border-accent-purple rounded-xl pl-24 pr-5 py-4 text-text-primary text-sm placeholder:text-text-muted transition-colors duration-200"
@@ -184,8 +211,18 @@ export default function Hero({ onLinkCreated }) {
                       </>
                     ) : (
                       <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                          />
                         </svg>
                         Shorten URL
                       </>
@@ -200,7 +237,9 @@ export default function Hero({ onLinkCreated }) {
               <div className="mt-6 p-4 bg-background rounded-xl border border-border animate-slide-down">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="flex flex-col min-w-0">
-                    <span className="text-xs text-text-muted mb-1">Your shortened URL</span>
+                    <span className="text-xs text-text-muted mb-1">
+                      Your shortened URL
+                    </span>
                     <a
                       href={`https://${shortenedUrl}`}
                       target="_blank"
@@ -223,15 +262,35 @@ export default function Hero({ onLinkCreated }) {
                     >
                       {copied ? (
                         <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                           Copied!
                         </>
                       ) : (
                         <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
                           </svg>
                           Copy
                         </>
