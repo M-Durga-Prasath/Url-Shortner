@@ -18,7 +18,14 @@ function truncateUrl(url, max = 45) {
 export default function RecentLinks({ extraLinks = [] }) {
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [origin, setOrigin] = useState("");
   const toast = useToast();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchLinks() {
@@ -31,7 +38,7 @@ export default function RecentLinks({ extraLinks = [] }) {
             data.links.map((l) => ({
               id: l.id,
               originalUrl: l.originalUrl,
-              shortUrl: `snip.link/${l.shortCode}`,
+              shortUrl: `${window.location.origin}/${l.shortCode}`,
               clicks: l.clicks,
               createdAt: l.createdAt,
             }))
@@ -51,7 +58,7 @@ export default function RecentLinks({ extraLinks = [] }) {
 
   const handleCopy = async (shortUrl) => {
     try {
-      await navigator.clipboard.writeText(`https://${shortUrl}`);
+      await navigator.clipboard.writeText(shortUrl);
       toast("Copied to clipboard!", "success");
     } catch {
       toast("Failed to copy", "error");
@@ -119,9 +126,14 @@ export default function RecentLinks({ extraLinks = [] }) {
                 {/* Short URL */}
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="text-xs text-text-muted lg:hidden">Short:</span>
-                  <span className="text-sm font-mono text-accent-cyan truncate">
+                  <a
+                    href={link.shortUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-mono text-accent-cyan truncate hover:underline"
+                  >
                     {link.shortUrl}
-                  </span>
+                  </a>
                 </div>
 
                 {/* Clicks */}

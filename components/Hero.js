@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "./Toast";
 
 function isValidUrl(str) {
@@ -29,8 +29,15 @@ export default function Hero({ onLinkCreated }) {
   const [loading, setLoading] = useState(false);
   const [urlError, setUrlError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [host, setHost] = useState("");
   const inputRef = useRef(null);
   const toast = useToast();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHost(window.location.host);
+    }
+  }, []);
 
   const handleShorten = async (e) => {
     e.preventDefault();
@@ -65,7 +72,7 @@ export default function Hero({ onLinkCreated }) {
         return;
       }
 
-      const shortened = `snip.link/${data.shortCode}`;
+      const shortened = `${window.location.origin}/${data.shortCode}`;
       setShortenedUrl(shortened);
       toast("Link shortened successfully!", "success");
 
@@ -89,7 +96,7 @@ export default function Hero({ onLinkCreated }) {
   const handleCopy = async () => {
     if (!shortenedUrl) return;
     try {
-      await navigator.clipboard.writeText(`https://${shortenedUrl}`);
+      await navigator.clipboard.writeText(shortenedUrl);
       setCopied(true);
       toast("Copied to clipboard!", "success");
       setTimeout(() => setCopied(false), 2000);
@@ -182,7 +189,7 @@ export default function Hero({ onLinkCreated }) {
               <div className="flex flex-col sm:flex-row gap-3 mt-1">
                 <div className="relative flex-1">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-sm select-none">
-                    snip.link/
+                    {host ? `${host}/` : "snip.link/"}
                   </span>
                   <input
                     id="alias-input"
@@ -193,7 +200,8 @@ export default function Hero({ onLinkCreated }) {
                     }
                     placeholder="custom-alias"
                     maxLength={20}
-                    className="w-full bg-background border border-border focus:border-accent-purple rounded-xl pl-24 pr-5 py-4 text-text-primary text-sm placeholder:text-text-muted transition-colors duration-200"
+                    style={{ paddingLeft: host ? `${(host.length + 2) * 8.5}px` : "96px" }}
+                    className="w-full bg-background border border-border focus:border-accent-purple rounded-xl pr-5 py-4 text-text-primary text-sm placeholder:text-text-muted transition-colors duration-200"
                     aria-label="Custom alias (optional)"
                   />
                 </div>
@@ -241,13 +249,13 @@ export default function Hero({ onLinkCreated }) {
                       Your shortened URL
                     </span>
                     <a
-                      href={`https://${shortenedUrl}`}
+                      href={shortenedUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-accent-cyan font-mono text-sm hover:underline truncate"
                       id="shortened-url-link"
                     >
-                      https://{shortenedUrl}
+                      {shortenedUrl}
                     </a>
                   </div>
                   <div className="flex items-center gap-2">

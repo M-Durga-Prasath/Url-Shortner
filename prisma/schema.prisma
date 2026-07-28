@@ -24,6 +24,7 @@ model Link {
   id         Int      @id @default(autoincrement())
   shortCode  String   @unique
   originalUrl String   @map("original_url")
+  smartRoutes Json     @default("{}") @map("smart_routes")
   isActive   Boolean  @default(true)
 
   clicks     Int      @default(0)
