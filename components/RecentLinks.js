@@ -65,9 +65,23 @@ export default function RecentLinks({ extraLinks = [] }) {
     }
   };
 
-  const handleDelete = (id) => {
-    setLinks((prev) => prev.filter((l) => l.id !== id));
-    toast("Link deleted", "info");
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`/api/links/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setLinks((prev) => prev.filter((l) => l.id !== id));
+        toast("Link deleted successfully", "success");
+      } else {
+        toast(data.message || "Failed to delete link", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting link:", error);
+      toast("Something went wrong while deleting", "error");
+    }
   };
 
   return (

@@ -100,7 +100,7 @@ export async function POST(req) {
       );
     }
 
-    await prisma.link.create({
+    const newLink = await prisma.link.create({
       data: {
         originalUrl: url,
         shortCode,
@@ -111,6 +111,7 @@ export async function POST(req) {
 
     return Response.json({
       success: true,
+      id: newLink.id,
       shortCode,
     });
   } catch (error) {

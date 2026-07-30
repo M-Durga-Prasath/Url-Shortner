@@ -12,16 +12,6 @@ function isValidUrl(str) {
   }
 }
 
-function generateShortCode() {
-  // remporary short code generator
-  const chars =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let code = "";
-  for (let i = 0; i < 7; i++)
-    code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
-}
-
 export default function Hero({ onLinkCreated }) {
   const [url, setUrl] = useState("");
   const [alias, setAlias] = useState("");
@@ -78,7 +68,7 @@ export default function Hero({ onLinkCreated }) {
 
       if (onLinkCreated) {
         onLinkCreated({
-          id: data.shortCode,
+          id: data.id,
           originalUrl: url,
           shortUrl: shortened,
           clicks: 0,
