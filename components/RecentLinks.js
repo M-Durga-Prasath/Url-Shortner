@@ -15,10 +15,11 @@ function truncateUrl(url, max = 45) {
   return url.length > max ? url.slice(0, max) + "…" : url;
 }
 
-export default function RecentLinks({ extraLinks = [] }) {
+export default function RecentLinks({ extraLinks = [], onLinkDeleted }) {
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [origin, setOrigin] = useState("");
+  const [linkToDelete, setLinkToDelete] = useState(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function RecentLinks({ extraLinks = [] }) {
               shortUrl: `${window.location.origin}/${l.shortCode}`,
               clicks: l.clicks,
               createdAt: l.createdAt,
-            }))
+            })),
           );
         }
       } catch (error) {
@@ -74,6 +75,7 @@ export default function RecentLinks({ extraLinks = [] }) {
 
       if (res.ok && data.success) {
         setLinks((prev) => prev.filter((l) => l.id !== id));
+        if (onLinkDeleted) onLinkDeleted(id);
         toast("Link deleted successfully", "success");
       } else {
         toast(data.message || "Failed to delete link", "error");
@@ -93,8 +95,7 @@ export default function RecentLinks({ extraLinks = [] }) {
             Recent Links
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Your{" "}
-            <span className="gradient-text">shortened links</span>
+            Your <span className="gradient-text">shortened links</span>
           </h2>
           <p className="text-text-secondary text-lg max-w-xl mx-auto">
             Manage and monitor all your shortened links in one place.
@@ -114,7 +115,9 @@ export default function RecentLinks({ extraLinks = [] }) {
 
           {allLinks.length === 0 ? (
             <div className="px-6 py-16 text-center text-text-muted">
-              <p className="text-sm">No links yet. Shorten your first URL above!</p>
+              <p className="text-sm">
+                No links yet. Shorten your first URL above!
+              </p>
             </div>
           ) : (
             allLinks.map((link, index) => (
@@ -125,7 +128,9 @@ export default function RecentLinks({ extraLinks = [] }) {
               >
                 {/* Original URL */}
                 <div className="flex flex-col min-w-0">
-                  <span className="text-xs text-text-muted lg:hidden mb-1">Original URL</span>
+                  <span className="text-xs text-text-muted lg:hidden mb-1">
+                    Original URL
+                  </span>
                   <a
                     href={link.originalUrl}
                     target="_blank"
@@ -139,7 +144,9 @@ export default function RecentLinks({ extraLinks = [] }) {
 
                 {/* Short URL */}
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-xs text-text-muted lg:hidden">Short:</span>
+                  <span className="text-xs text-text-muted lg:hidden">
+                    Short:
+                  </span>
                   <a
                     href={link.shortUrl}
                     target="_blank"
@@ -152,7 +159,9 @@ export default function RecentLinks({ extraLinks = [] }) {
 
                 {/* Clicks */}
                 <div className="flex items-center lg:justify-center">
-                  <span className="text-xs text-text-muted lg:hidden mr-2">Clicks:</span>
+                  <span className="text-xs text-text-muted lg:hidden mr-2">
+                    Clicks:
+                  </span>
                   <span className="text-sm font-semibold text-text-primary tabular-nums">
                     {link.clicks.toLocaleString()}
                   </span>
@@ -160,7 +169,9 @@ export default function RecentLinks({ extraLinks = [] }) {
 
                 {/* Created date */}
                 <div className="flex items-center">
-                  <span className="text-xs text-text-muted lg:hidden mr-2">Created:</span>
+                  <span className="text-xs text-text-muted lg:hidden mr-2">
+                    Created:
+                  </span>
                   <span className="text-sm text-text-secondary">
                     {formatDate(link.createdAt)}
                   </span>
@@ -174,8 +185,18 @@ export default function RecentLinks({ extraLinks = [] }) {
                     title="Copy link"
                     aria-label={`Copy ${link.shortUrl}`}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
                     </svg>
                   </button>
                   <button
@@ -184,18 +205,38 @@ export default function RecentLinks({ extraLinks = [] }) {
                     title="Edit link"
                     aria-label={`Edit ${link.shortUrl}`}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
                     </svg>
                   </button>
                   <button
-                    onClick={() => handleDelete(link.id)}
+                    onClick={() => setLinkToDelete(link)}
                     className="p-2 rounded-lg text-text-muted hover:text-error hover:bg-error/10 transition-all duration-200 cursor-pointer"
                     title="Delete link"
                     aria-label={`Delete ${link.shortUrl}`}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -204,6 +245,72 @@ export default function RecentLinks({ extraLinks = [] }) {
           )}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {linkToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity duration-300">
+          <div className="bg-surface border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl transition-all duration-300 transform scale-100">
+            <div className="flex items-center gap-3 text-error mb-4">
+              <div className="p-2 bg-error/10 rounded-full">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-text-primary">
+                Delete Link
+              </h3>
+            </div>
+
+            <p className="text-sm text-text-secondary mb-3">
+              Are you sure you want to delete this shortened link? This action
+              cannot be undone.
+            </p>
+
+            <div className="bg-surface-alt/50 border border-border/60 rounded-xl p-3 mb-6">
+              <p className="text-xs text-text-muted font-medium mb-1 uppercase tracking-wider">
+                Shortened URL
+              </p>
+              <p className="text-sm font-mono text-accent-cyan truncate mb-2">
+                {linkToDelete.shortUrl}
+              </p>
+              <p className="text-xs text-text-muted font-medium mb-1 uppercase tracking-wider">
+                Original URL
+              </p>
+              <p className="text-sm text-text-secondary truncate">
+                {linkToDelete.originalUrl}
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setLinkToDelete(null)}
+                className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-alt hover:bg-border border border-border rounded-xl transition-all duration-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleDelete(linkToDelete.id);
+                  setLinkToDelete(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-error hover:opacity-90 rounded-xl shadow-lg shadow-error/25 transition-all duration-200 cursor-pointer"
+              >
+                Delete Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

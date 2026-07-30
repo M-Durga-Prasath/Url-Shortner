@@ -15,13 +15,17 @@ function HomeContent() {
     setRecentLinks((prev) => [link, ...prev]);
   };
 
+  const handleLinkDeleted = (id) => {
+    setRecentLinks((prev) => prev.filter((l) => l.id !== id));
+  };
+
   return (
     <>
       <Navbar />
       <main className="flex-1">
         <Hero onLinkCreated={handleLinkCreated} />
         <Features />
-        <RecentLinks extraLinks={recentLinks} />
+        <RecentLinks extraLinks={recentLinks} onLinkDeleted={handleLinkDeleted} />
       </main>
       <Footer />
     </>
